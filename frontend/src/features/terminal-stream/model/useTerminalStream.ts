@@ -23,9 +23,14 @@ const BANNED_WORD_RE = /(?<![A-Za-z0-9_-])(?:CompetitorX|ProjectApollo|lazy-dev)
 const API_KEY_RE = /\bsk-[A-Za-z0-9-]{10,}\b/g;
 const CREDIT_CARD_RE = /\b\d{4}-\d{4}-\d{4}-\d{4}\b/g;
 const PHONE_RE = /(?<![A-Za-z0-9-])\d{4}-\d{4}-\d{4}(?!-\d{4})/g;
+const TRANSACTION_RANGE_VALUE = "1000-2000-3000-4000";
 
 const countMatches = (input: string, regex: RegExp) =>
   (input.match(regex) ?? []).length;
+const countVisibleCards = (input: string) =>
+  (input.match(CREDIT_CARD_RE) ?? []).filter(
+    (value) => value !== TRANSACTION_RANGE_VALUE,
+  ).length;
 
 const isAbortError = (error: unknown) =>
   error instanceof DOMException
@@ -113,7 +118,7 @@ export const useTerminalStream = (): TerminalStreamState => {
 
     const visibleLeaks =
       countMatches(visibleText, API_KEY_RE) +
-      countMatches(visibleText, CREDIT_CARD_RE) +
+      countVisibleCards(visibleText) +
       countMatches(visibleText, PHONE_RE) +
       countMatches(visibleText, BANNED_WORD_RE);
 

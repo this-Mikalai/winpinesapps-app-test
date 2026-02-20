@@ -1,0 +1,15 @@
+{
+  "name": "back-winpinesapps",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/server.ts",
+    "start": "bun src/server.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.9",
+    "@types/node": "^25.3.0",
+    "bun-types": "^1.3.9",
+    "typescript": "^5.9.3"
+  }
+}

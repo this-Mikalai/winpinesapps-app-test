@@ -1,0 +1,88 @@
+﻿:root {
+  font-family: "JetBrains Mono", "Consolas", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 800px at 8% 0%, #52ffad24 0%, #52ffad00 55%),
+    radial-gradient(1000px 700px at 100% 100%, #ffc56d1a 0%, #ffc56d00 62%),
+    linear-gradient(165deg, #030605 0%, #050b09 45%, #030504 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background:
+    linear-gradient(transparent 0%, #99ffce14 50%, transparent 100%),
+    repeating-linear-gradient(
+      0deg,
+      #ffffff08 0,
+      #ffffff08 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+.redacted {
+  color: #ff6676;
+  font-weight: 700;
+  text-shadow: 0 0 10px #ff677cad;
+  animation: glitch 1.35s steps(2) infinite;
+  cursor: help;
+}
+
+.terminal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #95ffc972 #ffffff08;
+}
+
+.terminal-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.terminal-scroll::-webkit-scrollbar-track {
+  background: #ffffff0a;
+  border-radius: 8px;
+}
+
+.terminal-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #9dffcbb8, #7ff0b270);
+  border-radius: 8px;
+  border: 2px solid #05100cb3;
+}
+
+@keyframes glitch {
+  0% {
+    filter: none;
+    transform: translateX(0);
+  }
+  20% {
+    filter: hue-rotate(8deg);
+    transform: translateX(0.4px);
+  }
+  40% {
+    filter: hue-rotate(-8deg);
+    transform: translateX(-0.4px);
+  }
+  60% {
+    filter: none;
+    transform: translateX(0.35px);
+  }
+  100% {
+    filter: none;
+    transform: translateX(0);
+  }
+}

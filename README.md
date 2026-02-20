@@ -36,14 +36,14 @@ Implementation file: `frontend/src/shared/lib/sanitizer/streamingSanitizer.ts`.
 Rules:
 
 - Blacklisted words (exact): `CompetitorX`, `ProjectApollo`, `lazy-dev`
-- API keys: tokens starting with `sk-`
+- API keys: `sk-` tokens with minimum payload length (short values like `sk-8899` are ignored)
 - Credit cards: card-like `XXXX-XXXX-XXXX-XXXX` (line-aware; skips transaction range rows)
 - Secure lines: `XXXX-XXXX-XXXX` with negative lookahead to avoid partial card matches
 
 Zero-flicker policy:
 
 - Incoming stream is processed incrementally.
-- The sanitizer keeps an internal pending buffer and only flushes completed safe segments (up to delimiters), so potentially sensitive fragments are never rendered before replacement.
+- The sanitizer keeps a fixed safety tail and flushes only safe completed segments before that tail, so potentially sensitive fragments are never rendered before replacement.
 - Sensitive matches are replaced with `[REDACTED]` before text is appended to UI state.
 
 ## Audit Log

@@ -19,8 +19,8 @@ export type TerminalStreamState = {
   tailRef: RefObject<HTMLDivElement | null>;
 };
 
-const BANNED_WORD_RE = /\b(?:CompetitorX|ProjectApollo|lazy-dev)\b/g;
-const API_KEY_RE = /\bsk-[A-Za-z0-9-]+\b/g;
+const BANNED_WORD_RE = /(?<![A-Za-z0-9_-])(?:CompetitorX|ProjectApollo|lazy-dev)(?![A-Za-z0-9_-])/g;
+const API_KEY_RE = /\bsk-[A-Za-z0-9-]{10,}\b/g;
 const CREDIT_CARD_RE = /\b\d{4}-\d{4}-\d{4}-\d{4}\b/g;
 const PHONE_RE = /(?<![A-Za-z0-9-])\d{4}-\d{4}-\d{4}(?!-\d{4})/g;
 

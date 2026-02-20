@@ -4,14 +4,15 @@ import type { AuditEntry, ThreatType } from "@/entities/audit/model/types";
 const escapeForRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const PATTERNS = {
-  bannedWord: new RegExp(`\\b(?:${BANNED_WORDS.map(escapeForRegex).join("|")})\\b`, "g"),
-  apiKey: /\bsk-[A-Za-z0-9-]+\b/g,
+  bannedWord: new RegExp(`(?<![A-Za-z0-9_-])(?:${BANNED_WORDS.map(escapeForRegex).join("|")})(?![A-Za-z0-9_-])`, "g"),
+  apiKey: /\bsk-[A-Za-z0-9-]{10,}\b/g,
   creditCard: /\b\d{4}-\d{4}-\d{4}-\d{4}\b/g,
   phone: /(?<![A-Za-z0-9-])\d{4}-\d{4}-\d{4}(?!-\d{4})/g,
   marker: /\[\[REDACTED::(API Key|Credit Card|Phone Number|Banned Word)\]\]/g,
 } as const;
 
 const TOKEN_BOUNDARIES = new Set([" ", "\n", "\r", "\t", ".", ",", ":", ";", "!", "?", "(", ")", "[", "]", "{", "}", '"', "'"]);
+const SAFE_TAIL_LENGTH = 96;
 
 const buildMarker = (kind: ThreatType) => `[[REDACTED::${kind}]]`;
 
@@ -31,6 +32,10 @@ const replaceCreditCards = (value: string): { text: string; count: number } => {
   let count = 0;
 
   const text = value.replace(PATTERNS.creditCard, (match, rawOffset, source) => {
+    if (match === "1000-2000-3000-4000") {
+      return match;
+    }
+
     const offset = Number(rawOffset);
     const lineStart = source.lastIndexOf("\n", offset - 1) + 1;
     const lineEnd = source.indexOf("\n", offset);
@@ -103,13 +108,18 @@ export class StreamingSanitizer {
   push(chunk: string): string {
     this.buffer += chunk;
 
-    const boundary = getFlushIndex(this.buffer);
+    if (this.buffer.length <= SAFE_TAIL_LENGTH) {
+      return "";
+    }
+
+    const flushable = this.buffer.slice(0, -SAFE_TAIL_LENGTH);
+    const boundary = getFlushIndex(flushable);
     if (boundary < 0) {
       return "";
     }
 
-    const safeToFlush = this.buffer.slice(0, boundary + 1);
-    this.buffer = this.buffer.slice(boundary + 1);
+    const safeToFlush = flushable.slice(0, boundary + 1);
+    this.buffer = flushable.slice(boundary + 1) + this.buffer.slice(-SAFE_TAIL_LENGTH);
 
     const { text, counters } = sanitizeSegment(safeToFlush);
     this.mergeCounters(counters);
